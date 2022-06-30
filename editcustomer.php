@@ -1,0 +1,127 @@
+<?php
+ob_start();
+include "layouts/header.php";
+if (!isset($_SESSION["name"])) {
+  header("location: index.php");
+}
+?>
+<?php include "layouts/navbar.php" ?>
+<?php include "layouts/sidebar.php" ?>
+
+<!-- Main content -->
+<main class="content-wrapper">
+  <div class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <div class="fs-3">Edit Customer</div>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-end">
+            <li class="breadcrumb-item"><a href="#">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Edit Customer</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Main content -->
+  <div class="content">
+    <div class="container-fluid">
+      <div class="row g-4">
+        <!-- Start column -->
+        <div class="col">
+          <!-- general form elements -->
+          <div class="card card-primary card-outline">
+            <div class="card-header">
+              <?php
+              include "functions/customer.php";
+
+              if (isset($_POST["save"])) {
+                $br_id = $_POST["br_id"];
+                $cusName = $_POST["cusName"];
+                $cusAdd = $_POST["cusAdd"];
+                $cusEmail = $_POST["cusEmail"];
+                $cusPhoneNumber = $_POST["cusPhoneNumber"];
+
+
+                if (empty($cusName)) {
+                  echo '<div class="alert alert-danger" role="alert">Customer Name field is Empty!</div>';
+                } elseif (empty($cusAdd)) {
+                  echo '<div class="alert alert-danger" role="alert">Customer Address field is Empty!</div>';
+                } elseif (empty($cusEmail)) {
+                  echo '<div class="alert alert-danger" role="alert">Customer Email field is Empty!</div>';
+                } elseif (empty($cusPhoneNumber)) {
+                  echo '<div class="alert alert-danger" role="alert">Phone Number field is Empty!</div>';
+                } else {
+                  $id = $_GET["id"];
+                  $result = editCustomer($br_id, $cusName, $cusAdd, $cusEmail, $cusPhoneNumber, $id);
+                  echo $result;
+                }
+              }
+              if (isset($_GET["id"])) {
+                $id = $_GET["id"];
+                $result = getDataById($id);
+
+                while ($data = $result->fetch_assoc()) {
+              ?>
+
+                  <form method="POST">
+                    <div class="card-body">
+                      <div class="mb-3 d-flex justify-content-between">
+                        <label class="form-label w-25">Branch</label>
+                        <select name="br_id" class="form-control w-75">
+                          <?php
+                          $branchData = branchData();
+                          if ($branchData->num_rows > 0) {
+                            while ($tmp = $branchData->fetch_assoc()) {
+                          ?>
+                              <option value="<?php echo $tmp["br_id"]; ?>">
+                                <?php echo $tmp["brName"]; ?>
+                              </option>
+                          <?php
+                            }
+                          }
+                          ?>
+                        </select>
+                      </div>
+                      <div class="mb-3 d-flex justify-content-between">
+                        <label for="cusName" class="form-label w-25">Customer Name</label>
+                        <input type="text" class="form-control w-75" id="cusName" name="cusName" value="<?php echo $data['cusName'] ?>">
+                      </div>
+                      <div class="mb-3 d-flex justify-content-between">
+                        <label for="cusAdd" class="form-label w-25">Customer Address</label>
+                        <input type="text" class="form-control w-75" id="cusAdd" name="cusAdd" value="<?php echo $data['cusAdd'] ?>">
+                      </div>
+                      <div class="mb-3 d-flex justify-content-between">
+                        <label for="cusEmail" class="form-label w-25">Email Address</label>
+                        <input type="text" class="form-control w-75" id="cusEmail" name="cusEmail" value="<?php echo $data['cusEmail'] ?>">
+                      </div>
+                      <div class="mb-3 d-flex justify-content-between">
+                        <label for="cusPhoneNumber" class="form-label w-25">Phone Number</label>
+                        <input type="text" class="form-control w-75" id="cusPhoneNumber" name="cusPhoneNumber" value="<?php echo $data['cusPhoneNumber'] ?>">
+                      </div>
+                    </div>
+                    <div class="card-footer">
+                      <button name="save" type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                  </form>
+              <?php
+                }
+              } else {
+                header("location :managecustomer.php");
+              }
+              ?>
+            </div>
+          </div>
+          <!-- /.card -->
+        </div>
+      </div>
+      <!-- /.row -->
+    </div><!-- /.container-fluid -->
+  </div>
+  <!-- /.content -->
+</main>
+<!-- /.content-wrapper -->
+
+<?php include "layouts/footer.php"; ?>
